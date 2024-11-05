@@ -10,7 +10,7 @@ import pandas as pd
 count = 50
 max_iterations = 100 # 50 * 100 = 5000 videos
 topic_id = "/m/03hf_rm" # Strategy Games
-API_KEY = 'AIzaSyDLjEkSmBEFvAAlpaHCrtdOEL_nd8Jk8Bk'
+API_KEY = 'dont post ur api ket lmao'
 
 # Read local data file
 filepath = "data.csv"
