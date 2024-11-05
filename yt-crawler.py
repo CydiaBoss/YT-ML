@@ -5,12 +5,16 @@ import string
 import random
 import os
 import pandas as pd
+from dotenv import load_dotenv
+
+# Load .env file with your api key
+load_dotenv()
 
 # Variables
 count = 50
 max_iterations = 100 # 50 * 100 = 5000 videos
 topic_id = "/m/03hf_rm" # Strategy Games
-API_KEY = 'dont post ur api ket lmao'
+API_KEY = os.getenv("APIKEY")
 
 # Read local data file
 filepath = "data.csv"
