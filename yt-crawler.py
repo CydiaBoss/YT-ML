@@ -14,6 +14,7 @@ load_dotenv()
 count = 50
 max_iterations = 100 # 50 * 100 = 5000 videos
 topic_id = "/m/03hf_rm" # Strategy Games
+lang = "en"
 API_KEY = os.getenv("APIKEY")
 
 # Read local data file
@@ -32,7 +33,7 @@ for i in range(max_iterations):
 
     # Calls the API for search results (100 units)
     try:
-        urlData_query = f"https://www.googleapis.com/youtube/v3/search?key={API_KEY}&maxResults={count}&part=snippet&type=video&topicId={topic_id}&q={r_q}"
+        urlData_query = f"https://www.googleapis.com/youtube/v3/search?key={API_KEY}&maxResults={count}&part=snippet&type=video&relevanceLanguage={lang}&topicId={topic_id}&q={r_q}"
         webURL_query = urllib.request.urlopen(urlData_query)
         raw_vid_data = webURL_query.read()
         results_vids = json.loads(raw_vid_data.decode(webURL_query.info().get_content_charset('utf-8')))
@@ -99,7 +100,7 @@ for i in range(max_iterations):
                 continue
 
         # Update User
-        print(f"API call #{i} successfully")
+        print(f"API call #{i + 1} successfully")
 
         # Dumb Data to prevent loss every 5 runs
         if i % 5 == 0:
