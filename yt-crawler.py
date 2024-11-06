@@ -45,29 +45,33 @@ for i in range(max_iterations):
                 continue
 
             # Parse data
-            new_row = pd.DataFrame([{
-                "yt-id": video_data['id']['videoId'],
-                "title": video_data['snippet']['title'],
-                "created": video_data['snippet']['publishedAt'],
-                "channel-id": video_data['snippet']['channelId'],
-                "thumbnail": video_data['snippet']['thumbnails']["default"]["url"],
-                "thumbnail-w": video_data['snippet']['thumbnails']["default"]["width"],
-                "thumbnail-h": video_data['snippet']['thumbnails']["default"]["height"],
-                "query": r_q,
-            },])
-            new_row = new_row.set_index("yt-id")
-
             try:
-                # Append
-                df = pd.concat([df, new_row], verify_integrity=True)
+                new_row = pd.DataFrame([{
+                    "yt-id": video_data['id']['videoId'],
+                    "title": video_data['snippet']['title'],
+                    "created": video_data['snippet']['publishedAt'],
+                    "channel-id": video_data['snippet']['channelId'],
+                    "thumbnail": video_data['snippet']['thumbnails']["default"]["url"],
+                    "thumbnail-w": video_data['snippet']['thumbnails']["default"]["width"],
+                    "thumbnail-h": video_data['snippet']['thumbnails']["default"]["height"],
+                    "query": r_q,
+                },])
+                new_row = new_row.set_index("yt-id")
 
-                # Store your ids
-                yt_reads += 1
+                try:
+                    # Append
+                    df = pd.concat([df, new_row], verify_integrity=True)
 
-                # Prepare id for stats query
-                yt_ids.append(video_data['id']['videoId'])
-            except ValueError:
-                # Duplicate video detected
+                    # Store your ids
+                    yt_reads += 1
+
+                    # Prepare id for stats query
+                    yt_ids.append(video_data['id']['videoId'])
+                except ValueError:
+                    # Duplicate video detected
+                    continue
+            except KeyError:
+                # Weird Entry
                 continue
 
         # Generate & call statistic query (1 unit)
@@ -78,17 +82,21 @@ for i in range(max_iterations):
 
         # Process Stats Response
         for stats_data in results_stats["items"]:
-            # Parse data
-            new_row = pd.DataFrame([{
-                "yt-id": stats_data['id'],
-                "view-count": stats_data['statistics']['viewCount'],
-                "like-count": stats_data['statistics']['likeCount'] if 'likeCount' in stats_data['statistics'] else "",
-                "comment-count": stats_data['statistics']['commentCount'] if 'commentCount' in stats_data['statistics'] else "",
-            },])
-            new_row = new_row.set_index("yt-id")
+            try:
+                # Parse data
+                new_row = pd.DataFrame([{
+                    "yt-id": stats_data['id'],
+                    "view-count": stats_data['statistics']['viewCount'],
+                    "like-count": stats_data['statistics']['likeCount'] if 'likeCount' in stats_data['statistics'] else "",
+                    "comment-count": stats_data['statistics']['commentCount'] if 'commentCount' in stats_data['statistics'] else "",
+                },])
+                new_row = new_row.set_index("yt-id")
 
-            # Update main dataset
-            df.update(new_row)
+                # Update main dataset
+                df.update(new_row)
+            except KeyError:
+                # Weird Entry
+                continue
 
         # Update User
         print(f"API call #{i} successfully")
