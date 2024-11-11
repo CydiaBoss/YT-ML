@@ -31,11 +31,12 @@ yt_ids = list(df[df["view-count"].isna()].index)
 # Loop
 yt_reads = 0
 for i in range(max_iterations):
-    # Generates random query for YT
-    r_q = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(3))
     try:
         # Check if any stats calls are needed
         if len(yt_ids) > 0:
+            # Message 
+            print("Pulling statistics for missing data values")
+
             # Generate & call statistic query (1 unit)
             urlData_stats = f"https://www.googleapis.com/youtube/v3/videos?key={API_KEY}&part=statistics&id={','.join(yt_ids)}"
             yt_ids = [] # Reset after used
@@ -60,6 +61,15 @@ for i in range(max_iterations):
                 except KeyError:
                     # Weird Entry
                     continue
+
+            # Message 
+            print("Finished pulling statistics for current batch")
+
+        # Message
+        print(f"Pulling {count} random videos")
+
+        # Generates random query for YT
+        r_q = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(3))
 
         # Calls the API for search results (100 units)
         urlData_query = f"https://www.googleapis.com/youtube/v3/search?key={API_KEY}&maxResults={count}&part=snippet&type=video&relevanceLanguage={lang}&topicId={topic_id}&q={r_q}"
