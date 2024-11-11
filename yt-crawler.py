@@ -25,21 +25,49 @@ else:
     df = pd.DataFrame([], columns=["yt-id", "title", "created", "channel-id", "thumbnail", "thumbnail-w", "thumbnail-h", "view-count", "like-count", "comment-count", "query"])
     df = df.set_index("yt-id")
 
+# Grab missing data IDs for query
+yt_ids = list(df[df["view-count"].isna()].index)
+
 # Loop
 yt_reads = 0
 for i in range(max_iterations):
     # Generates random query for YT
     r_q = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(3))
-
-    # Calls the API for search results (100 units)
     try:
+        # Check if any stats calls are needed
+        if len(yt_ids) > 0:
+            # Generate & call statistic query (1 unit)
+            urlData_stats = f"https://www.googleapis.com/youtube/v3/videos?key={API_KEY}&part=statistics&id={','.join(yt_ids)}"
+            yt_ids = [] # Reset after used
+            webURL_stats = urllib.request.urlopen(urlData_stats)
+            raw_stats_data = webURL_stats.read()
+            results_stats = json.loads(raw_stats_data.decode(webURL_stats.info().get_content_charset('utf-8')))
+
+            # Process Stats Response
+            for stats_data in results_stats["items"]:
+                try:
+                    # Parse data
+                    new_row = pd.DataFrame([{
+                        "yt-id": stats_data['id'],
+                        "view-count": stats_data['statistics']['viewCount'],
+                        "like-count": stats_data['statistics']['likeCount'] if 'likeCount' in stats_data['statistics'] else "",
+                        "comment-count": stats_data['statistics']['commentCount'] if 'commentCount' in stats_data['statistics'] else "",
+                    },])
+                    new_row = new_row.set_index("yt-id")
+
+                    # Update main dataset
+                    df.update(new_row)
+                except KeyError:
+                    # Weird Entry
+                    continue
+
+        # Calls the API for search results (100 units)
         urlData_query = f"https://www.googleapis.com/youtube/v3/search?key={API_KEY}&maxResults={count}&part=snippet&type=video&relevanceLanguage={lang}&topicId={topic_id}&q={r_q}"
         webURL_query = urllib.request.urlopen(urlData_query)
         raw_vid_data = webURL_query.read()
         results_vids = json.loads(raw_vid_data.decode(webURL_query.info().get_content_charset('utf-8')))
 
         # Process Video Response
-        yt_ids = []
         for video_data in results_vids['items']:
             # Ignore Live and Upcoming Content (no ratings yet)
             if video_data['snippet']['liveBroadcastContent'] != "none":
@@ -71,30 +99,6 @@ for i in range(max_iterations):
                 except ValueError:
                     # Duplicate video detected
                     continue
-            except KeyError:
-                # Weird Entry
-                continue
-
-        # Generate & call statistic query (1 unit)
-        urlData_stats = f"https://www.googleapis.com/youtube/v3/videos?key={API_KEY}&part=statistics&id={','.join(yt_ids)}"
-        webURL_stats = urllib.request.urlopen(urlData_stats)
-        raw_stats_data = webURL_stats.read()
-        results_stats = json.loads(raw_stats_data.decode(webURL_stats.info().get_content_charset('utf-8')))
-
-        # Process Stats Response
-        for stats_data in results_stats["items"]:
-            try:
-                # Parse data
-                new_row = pd.DataFrame([{
-                    "yt-id": stats_data['id'],
-                    "view-count": stats_data['statistics']['viewCount'],
-                    "like-count": stats_data['statistics']['likeCount'] if 'likeCount' in stats_data['statistics'] else "",
-                    "comment-count": stats_data['statistics']['commentCount'] if 'commentCount' in stats_data['statistics'] else "",
-                },])
-                new_row = new_row.set_index("yt-id")
-
-                # Update main dataset
-                df.update(new_row)
             except KeyError:
                 # Weird Entry
                 continue
