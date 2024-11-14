@@ -37,30 +37,34 @@ for i in range(max_iterations):
             # Message 
             print("Pulling statistics for missing data values")
 
-            # Generate & call statistic query (1 unit)
-            urlData_stats = f"https://www.googleapis.com/youtube/v3/videos?key={API_KEY}&part=statistics&id={','.join(yt_ids)}"
-            yt_ids = [] # Reset after used
-            webURL_stats = urllib.request.urlopen(urlData_stats)
-            raw_stats_data = webURL_stats.read()
-            results_stats = json.loads(raw_stats_data.decode(webURL_stats.info().get_content_charset('utf-8')))
+            # Split up batch by 50 if needed
+            for index_split in range(50, len(yt_ids) + 1, 50):
+                # Generate & call statistic query (1 unit)
+                urlData_stats = f"https://www.googleapis.com/youtube/v3/videos?key={API_KEY}&part=statistics&id={','.join(yt_ids[index_split - 50:index_split])}"
+                webURL_stats = urllib.request.urlopen(urlData_stats)
+                raw_stats_data = webURL_stats.read()
+                results_stats = json.loads(raw_stats_data.decode(webURL_stats.info().get_content_charset('utf-8')))
 
-            # Process Stats Response
-            for stats_data in results_stats["items"]:
-                try:
-                    # Parse data
-                    new_row = pd.DataFrame([{
-                        "yt-id": stats_data['id'],
-                        "view-count": stats_data['statistics']['viewCount'],
-                        "like-count": stats_data['statistics']['likeCount'] if 'likeCount' in stats_data['statistics'] else "",
-                        "comment-count": stats_data['statistics']['commentCount'] if 'commentCount' in stats_data['statistics'] else "",
-                    },])
-                    new_row = new_row.set_index("yt-id")
+                # Process Stats Response
+                for stats_data in results_stats["items"]:
+                    try:
+                        # Parse data
+                        new_row = pd.DataFrame([{
+                            "yt-id": stats_data['id'],
+                            "view-count": stats_data['statistics']['viewCount'],
+                            "like-count": stats_data['statistics']['likeCount'] if 'likeCount' in stats_data['statistics'] else "",
+                            "comment-count": stats_data['statistics']['commentCount'] if 'commentCount' in stats_data['statistics'] else "",
+                        },])
+                        new_row = new_row.set_index("yt-id")
 
-                    # Update main dataset
-                    df.update(new_row)
-                except KeyError:
-                    # Weird Entry
-                    continue
+                        # Update main dataset
+                        df.update(new_row)
+                    except KeyError:
+                        # Weird Entry
+                        continue
+
+            # Reset after used
+            yt_ids = [] 
 
             # Message 
             print("Finished pulling statistics for current batch")
