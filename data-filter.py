@@ -1,12 +1,19 @@
 import pandas as pd
+from googletrans import Translator
 
-# Merge both datasets
-filepath_1 = "data_1.csv"
-filepath_2 = "data_1.csv"
-df_1 = pd.read_csv(filepath_1, index_col="yt-id")
-df_2 = pd.read_csv(filepath_2, index_col="yt-id")
+# Constants
+MULT_CSV = False
+filepath = "data.csv"
+filepath_2 = "data_2.csv"
+lang = "en"
 
-combined_data = pd.concat([df_1, df_2])
+# Read Data
+df = pd.read_csv(filepath, index_col="yt-id")
+
+# Merge multiple if needed
+if MULT_CSV:
+	df_2 = pd.read_csv(filepath_2, index_col="yt-id")
+	df = pd.concat([df, df_2])
 
 # Filtering data
-combined_data.drop_duplicates(["yt-id",])
+df = df.drop_duplicates("yt-id")
