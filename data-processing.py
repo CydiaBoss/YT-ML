@@ -21,14 +21,19 @@ processed_df = df[["title", "view-count"]]
 # Remove meaningless words and emoji from title
 token = TreebankWordTokenizer()
 detoken = TreebankWordDetokenizer()
+# Stopwords
 nltk.download('stopwords')
 stopwords_list = stopwords.words("english")
+# Punctuation
 punc_list = list(string.punctuation)
 punc_list.append("…")
-
+punc_re = re.compile(pattern=f"[{re.escape(string.punctuation)}]", flags = re.UNICODE)
+# Emojis
 emoji_re = re.compile(pattern="[\U000000A9-\U0010ffff]", flags = re.UNICODE)
+
 def filter_title(x):
 	# Remove Emojis
+	print(x["title"])
 	raw_title = emoji_re.sub(r'', x["title"])
 
 	# Remove Insignificant Words
@@ -38,9 +43,11 @@ def filter_title(x):
 	# Remove Punctuation
 	punc_words = [word for word in filter_words if word not in punc_list]
 	x["title"] = detoken.detokenize(punc_words)
+	x["title"] = punc_re.sub(r'', x["title"])
 
 	return x
 
 processed_df = processed_df.apply(filter_title, axis=1, result_type='broadcast')
 
+# Save Processed File
 processed_df.to_csv(file_processed)
