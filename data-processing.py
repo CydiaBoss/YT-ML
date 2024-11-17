@@ -2,6 +2,8 @@ import re
 import pandas as pd
 from PIL import Image
 
+import string
+
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize.treebank import TreebankWordDetokenizer, TreebankWordTokenizer
@@ -21,16 +23,22 @@ token = TreebankWordTokenizer()
 detoken = TreebankWordDetokenizer()
 nltk.download('stopwords')
 stopwords_list = stopwords.words("english")
+punc_list = list(string.punctuation)
+punc_list.append("…")
 
 emoji_re = re.compile(pattern="[\U000000A9-\U0010ffff]", flags = re.UNICODE)
 def filter_title(x):
 	# Remove Emojis
 	raw_title = emoji_re.sub(r'', x["title"])
 
-	# Remove insignificant words
+	# Remove Insignificant Words
 	words = token.tokenize(raw_title.lower())
 	filter_words = [word for word in words if word not in stopwords_list]
-	x["title"] = detoken.detokenize(filter_words)
+
+	# Remove Punctuation
+	punc_words = [word for word in filter_words if word not in punc_list]
+	x["title"] = detoken.detokenize(punc_words)
+
 	return x
 
 processed_df = processed_df.apply(filter_title, axis=1, result_type='broadcast')
