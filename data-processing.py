@@ -16,7 +16,7 @@ file_processed = "data-processed.csv"
 df = pd.read_csv(filepath, index_col="yt-id")
 
 # Create new dataframe for processed data
-processed_df = df[["title", "view-count"]]
+processed_df = df[["title",]]
 
 # Remove meaningless words and emoji from title
 token = TreebankWordTokenizer()
@@ -48,6 +48,12 @@ def filter_title(x):
 	return x
 
 processed_df = processed_df.apply(filter_title, axis=1, result_type='broadcast')
+
+# Calculate Scoring for each
+processed_df["score"] = df["like-count"]/df["view-count"]
+
+# Fill blank scores with zero (0/0)
+processed_df["score"] = processed_df["score"].fillna(0.0)
 
 # Save Processed File
 processed_df.to_csv(file_processed)
