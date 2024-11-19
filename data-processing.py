@@ -1,7 +1,6 @@
-import re
 import pandas as pd
-from PIL import Image
 
+import re
 import string
 
 import nltk
@@ -11,6 +10,7 @@ from nltk.tokenize.treebank import TreebankWordDetokenizer, TreebankWordTokenize
 # Constants
 filepath = "data-filtered.csv"
 file_processed = "data-processed.csv"
+dirpath = "thumbnail"
 
 # Read Data
 df = pd.read_csv(filepath, index_col="yt-id")
