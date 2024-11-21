@@ -5,7 +5,7 @@ from PIL import Image
 
 class ThumbnailDataGenerator(Sequence):
 
-	def __init__(self, filedir : str, list_IDs : list[str], labels : dict[str, float], rescale : float=255.0, filetype : str="jpg", batch_size : int=32, dim : tuple[int, int]=(90, 120)):
+	def __init__(self, filedir : str, list_IDs : list[str], labels : dict[str, float], rescale : float=255.0, filetype : str="jpg", batch_size : int=32, dim : tuple[int, int]=(90, 120), shuffle=False):
 		'''
 		Data Generator Initialization Function 
 		'''
@@ -16,6 +16,7 @@ class ThumbnailDataGenerator(Sequence):
 		self.batch_size = batch_size
 		self.labels = labels
 		self.list_IDs = list_IDs
+		self.shuffle = shuffle
 		self.on_epoch_end()
 
 	def on_epoch_end(self):
@@ -23,6 +24,10 @@ class ThumbnailDataGenerator(Sequence):
 		Updates indexes after each epoch
 		'''
 		self.indexes = np.arange(len(self.list_IDs))
+
+		# Randomize if Shuffle
+		if self.shuffle:
+			np.random.shuffle(self.indexes)
 
 	def __data_generation(self, list_IDs_temp):
 		'''
