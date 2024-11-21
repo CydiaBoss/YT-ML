@@ -5,13 +5,14 @@ from PIL import Image
 
 class ThumbnailDataGenerator(Sequence):
 
-	def __init__(self, filedir : str, list_IDs : list[str], labels : dict[str, float], filetype : str="jpg", batch_size : int=32, dim : tuple[int, int]=(90, 120)):
+	def __init__(self, filedir : str, list_IDs : list[str], labels : dict[str, float], rescale : float=255.0, filetype : str="jpg", batch_size : int=32, dim : tuple[int, int]=(90, 120)):
 		'''
 		Data Generator Initialization Function 
 		'''
 		self.filedir = filedir
 		self.filetype = filetype
 		self.dim = dim
+		self.rescale = rescale
 		self.batch_size = batch_size
 		self.labels = labels
 		self.list_IDs = list_IDs
@@ -39,6 +40,9 @@ class ThumbnailDataGenerator(Sequence):
 			# Store class
 			y[i] = self.labels[ID]
 
+		# Rescale
+		X /= self.rescale
+
 		return X, y
 	
 	def __len__(self):
@@ -58,6 +62,4 @@ class ThumbnailDataGenerator(Sequence):
 		list_IDs_temp = [self.list_IDs[k] for k in indexes]
 
 		# Generate data
-		X, y = self.__data_generation(list_IDs_temp)
-
-		return X, y
+		return self.__data_generation(list_IDs_temp)
