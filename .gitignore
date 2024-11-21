@@ -1,4 +1,6 @@
 *.csv
+*.zip
 *.env
 test.py
 thumbnail
+__pycache__
