@@ -25,3 +25,11 @@ images = images[valid_index]
 
 # Normalize Pixels
 images /= 255.0
+
+# Vectorization Layer
+vectorize_layer = TextVectorization(
+    standardize=text_standardization,
+    max_tokens=text_input_dim,
+    output_mode="int",
+    output_sequence_length=sequence_length,
+)
