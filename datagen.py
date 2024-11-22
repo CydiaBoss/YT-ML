@@ -5,7 +5,7 @@ from PIL import Image
 
 class ThumbnailDataGenerator(Sequence):
 
-	def __init__(self, filedir : str, list_IDs : list[str], labels : dict[str, float], rescale : float=255.0, filetype : str="jpg", batch_size : int=32, dim : tuple[int, int]=(90, 120), shuffle=False):
+	def __init__(self, filedir : str, list_IDs : list[str], labels : dict[str, float], rescale : float=255.0, filetype : str="jpg", batch_size : int=32, dim : tuple[int, int]=(90, 120), shuffle=True):
 		'''
 		Data Generator Initialization Function 
 		'''
