@@ -1,5 +1,5 @@
 import numpy as np
-from keras.utils import Sequence
+from keras.api.utils import Sequence
 
 from PIL import Image 
 
