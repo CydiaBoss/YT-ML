@@ -15,11 +15,11 @@ Then, simply open `model.ipynb` and go through the steps for model setup.
 ## Models
 There are three models that are tested for this project. There is the image-only model, the text-only model, and the united model. The united model merges both image and text models into a single model. This is to test their effectiveness separately and together. See below for an in-depth layout of their design.
 
-![Image Model Design](img_model.jpg)
+![Image Model Design](img_model.png)
 
-![Text Model Design](text_model.jpg)
+![Text Model Design](text_model.png)
 
-![United Model Design](united_model.jpg)
+![United Model Design](united_model.png)
 
 ## Additional Information
 All main scripts have and will be integrated into a single Juypter Notebook file. All the old scripts and code snippets have been placed in the `deprecated` folder.
