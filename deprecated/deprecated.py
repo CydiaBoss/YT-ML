@@ -20,6 +20,12 @@ for f in files:
 
 	i += 1
 
+# Tokenizer
+tokenizer_layer = Tokenizer(num_words=10000, oov_token="<OOV>")
+tokenizer_layer.fit_on_texts(raw_data["title"])
+sequences = tokenizer_layer.texts_to_sequences(raw_data["title"])
+padded_sequences = pad_sequences(sequences, maxlen=10, padding='post')
+
 # Filter
 images = images[valid_index]
 
