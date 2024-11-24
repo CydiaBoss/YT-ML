@@ -6,3 +6,4 @@ thumbnail
 __pycache__
 models
 .venv
+.vscode
