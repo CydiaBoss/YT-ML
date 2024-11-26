@@ -1,8 +1,10 @@
 *.csv
+*.parquet
 *.zip
 *.env
 test.py
-thumbnail
+thumbnail*
+old
 __pycache__
 models
 .venv

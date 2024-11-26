@@ -6,9 +6,11 @@ charset-normalizer==3.4.0
 click==8.1.7
 colorama==0.4.6
 comm==0.2.2
+cramjam==2.9.0
 debugpy==1.8.9
 decorator==5.1.1
 executing==2.1.0
+fastparquet==2024.11.0
 filelock==3.16.1
 flatbuffers==24.3.25
 fsspec==2024.10.0
@@ -48,6 +50,7 @@ prompt_toolkit==3.0.48
 protobuf==5.28.3
 psutil==6.1.0
 pure_eval==0.2.3
+pyarrow==18.0.0
 pydot==3.0.2
 Pygments==2.18.0
 pyparsing==3.2.0
