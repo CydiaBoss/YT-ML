@@ -32,25 +32,6 @@ images = images[valid_index]
 # Normalize Pixels
 images /= 255.0
 
-# Regex Patterns
-emoji_re = "[\U000000A9-\U0010ffff]"
-punc_re = f"[{re.escape(string.punctuation)}]"
-space_re = "\s{1,}"
-
-# Download Stopwords & pattern
-nltk.download('stopwords')
-stopwords_list = stopwords.words("english")
-sw_re = f'\b(?:{"|".join([f"{re.escape(sw)}" for sw in stopwords_list])})\b'
-
-# Text Processing
-def text_standardization(raw_strs):
-	t = tf.strings.lower(raw_strs)
-	t = tf.strings.regex_replace(t, emoji_re, "")
-	t = tf.strings.regex_replace(t, sw_re, "")
-	t = tf.strings.regex_replace(t, punc_re, "")
-	t = tf.strings.regex_replace(t, space_re, " ")
-	return t
-
 # Vectorization Layer
 vectorize_layer = TextVectorization(
     standardize=text_standardization,
@@ -58,3 +39,16 @@ vectorize_layer = TextVectorization(
     output_mode="int",
     output_sequence_length=sequence_length,
 )
+
+# Label Processing
+scores = raw_data["viewCount"] # Grab View Count
+scores = scores.fillna(0.0) # Replace NaN with 0
+scores = scores.map(lambda x : np.log10(x + 1)) # Log everything to make it less extreme
+scores = scores.div(np.log10(MAX_VIEWS + 1)) # Normalized (+1 to prevent one)
+
+plt.hist(scores, 10)
+
+# Boolean Label
+b_scores = scores.map(lambda x : int(x >= THRESHOLD))
+
+plt.pie(b_scores.value_counts(), labels=["Bad", "Good"])

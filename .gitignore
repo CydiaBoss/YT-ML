@@ -6,6 +6,6 @@ test.py
 thumbnail*
 old
 __pycache__
-models
+models*
 .venv
 .vscode
